@@ -8,6 +8,7 @@ use std::sync::mpsc::channel;
 use vec3::Vec3;
 use rand::{thread_rng, Rng, Isaac64Rng};
 use threadpool::ThreadPool;
+use std::time::{Duration, Instant};
 
 pub static EPSILON: f64 = ::std::f64::EPSILON * 10000.0;
 
@@ -32,6 +33,15 @@ impl Renderer {
         let mut surface = Surface::new(camera.image_width as usize,
                                        camera.image_height as usize,
                                        ColorRGBA::new_rgb(0, 0, 0));
+        match ::util::import::from_image("checkpoint.png") {
+            Ok(checkpoint_surface) => {
+                println!("loading checkpoint");
+                surface.merge(&checkpoint_surface);
+            },
+            Err(err) => {
+                println!("{}", err);
+            },
+        }
 
         let pool = ThreadPool::new(self.tasks);
 
@@ -57,9 +67,15 @@ impl Renderer {
 
         let start_time = ::time::get_time();
 
+        let mut last_checkpoint = Instant::now();
         for (i, subsurface) in rx.iter().enumerate() {
             surface.merge(&subsurface);
             ::util::print_progress("Tile", start_time.clone(), (i + 1) as usize, jobs);
+            if Instant::now().duration_since(last_checkpoint.clone()) > Duration::from_secs(10) {
+                println!("writing checkpoint");
+                ::util::export::to_ppm(&surface, "checkpoint.ppm").expect("ppm write failure");
+                last_checkpoint = Instant::now();
+            }
         }
         surface
     }

@@ -1,6 +1,6 @@
 {
     "name": "cornell",
-    "size": [512, 512],
+    "size": [2048, 2048],
     "fov": 30.0,
     "reflect_depth": 3,
     "refract_depth": 6,

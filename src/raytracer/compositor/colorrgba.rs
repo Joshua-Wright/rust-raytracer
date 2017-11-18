@@ -39,7 +39,7 @@ impl Channel for f64 {
 }
 
 
-#[derive(Copy)]
+#[derive(Copy, PartialEq)]
 pub struct ColorRGBA<T> {
     pub r: T,
     pub g: T,

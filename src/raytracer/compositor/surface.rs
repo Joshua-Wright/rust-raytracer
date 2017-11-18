@@ -52,6 +52,7 @@ impl Surface {
 
     pub fn divide(&self, tile_width: usize, tile_height: usize) -> SubsurfaceIterator {
         SubsurfaceIterator {
+            surface: &self,
             parent_width: self.width,
             parent_height: self.height,
             background: self.background,
@@ -132,7 +133,8 @@ impl IndexMut<(usize, usize)> for Surface {
     }
 }
 
-pub struct SubsurfaceIterator {
+pub struct SubsurfaceIterator<'a> {
+    surface: &'a Surface,
     x_delta: usize,
     x_off: usize,
     y_delta: usize,
@@ -143,7 +145,20 @@ pub struct SubsurfaceIterator {
 }
 
 
-impl SubsurfaceIterator {
+impl<'a> SubsurfaceIterator<'a> {
+    fn is_blank(&self) -> bool {
+        for y in self.y_off..(self.y_off + self.y_delta) {
+            for x in self.x_off..(self.x_off + self.x_delta) {
+                if x < self.parent_width && y < self.parent_height {
+                    if self.surface[(x,y)] != self.background {
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     fn incr_tile(&mut self) {
         if self.x_off + self.x_delta < self.parent_width {
             self.x_off += self.x_delta;
@@ -168,12 +183,15 @@ impl SubsurfaceIterator {
     }
 }
 
-impl Iterator for SubsurfaceIterator {
+impl<'a> Iterator for SubsurfaceIterator<'a> {
     type Item = SurfaceFactory;
 
     fn next(&mut self) -> Option<SurfaceFactory> {
         let tile = self.current_tile();
         self.incr_tile();
+        while !self.is_blank() {
+            self.incr_tile();
+        }
         tile
     }
 }
