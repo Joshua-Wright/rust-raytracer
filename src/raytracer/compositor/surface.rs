@@ -4,6 +4,17 @@ use std::ops::{Index, IndexMut};
 
 use raytracer::compositor::{ColorRGBA, SurfaceFactory};
 
+pub struct IterPixel<'a, T: 'a>(::std::slice::Iter<'a, ColorRGBA<T>>);
+
+impl<'a, T> Iterator for IterPixel<'a, T> where T: 'a {
+    type Item = &'a ColorRGBA<T>;
+
+    fn next(&mut self) -> Option<&'a ColorRGBA<T>> {
+        self.0.next()
+    }
+}
+
+
 pub struct IterPixelMut<'a, T: 'a>(::std::slice::IterMut<'a, ColorRGBA<T>>);
 
 impl<'a, T> Iterator for IterPixelMut<'a, T> where T: 'a {
@@ -108,6 +119,10 @@ impl Surface {
             panic!("`y` out of bounds (0 <= {} < {}", y, self.height);
         }
         self.width * y + x
+    }
+
+    pub fn iter_pixels<'a>(&'a self) -> IterPixel<'a, u8> {
+        IterPixel(self.buffer.iter())
     }
 
     pub fn iter_pixels_mut<'a>(&'a mut self) -> IterPixelMut<'a, u8> {
@@ -228,7 +243,8 @@ fn test_paint_it_red() {
     let background: ColorRGBA<u8> = ColorRGBA::new_rgb(0, 0, 0);
     let mut surf: Surface = Surface::new(width, height, background);
 
-    for tile_factory in surf.divide(width_tile, height_tile) {
+    let tiles : Vec<SurfaceFactory> = surf.divide(width_tile, height_tile).collect();
+    for tile_factory in tiles.iter() {
         let mut tile = tile_factory.create();
         for y in 0..tile.height {
             for x in 0..tile.width {

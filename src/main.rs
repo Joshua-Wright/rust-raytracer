@@ -131,6 +131,7 @@ fn main() {
         shadow_samples: config.shadow_samples,
         gloss_samples: config.gloss_samples,
         pixel_samples: config.pixel_samples,
+        write_checkpoints: true,
     };
 
     let renderer = raytracer::Renderer {

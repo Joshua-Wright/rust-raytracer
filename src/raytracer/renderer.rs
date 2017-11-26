@@ -19,6 +19,7 @@ pub struct RenderOptions {
     pub shadow_samples: u32, // Number of samples for soft shadows and area lights.
     pub gloss_samples: u32,  // Number of samples for glossy reflections.
     pub pixel_samples: u32,  // The square of this is the number of samples per pixel.
+    pub write_checkpoints: bool,
 }
 
 #[derive(Clone)]
@@ -33,14 +34,16 @@ impl Renderer {
         let mut surface = Surface::new(camera.image_width as usize,
                                        camera.image_height as usize,
                                        ColorRGBA::new_rgb(0, 0, 0));
-        match ::util::import::from_image("checkpoint.png") {
-            Ok(checkpoint_surface) => {
-                println!("loading checkpoint");
-                surface.merge(&checkpoint_surface);
-            },
-            Err(err) => {
-                println!("{}", err);
-            },
+        if self.options.write_checkpoints {
+            match ::util::import::from_image("checkpoint.png") {
+                Ok(checkpoint_surface) => {
+                    surface.merge(&checkpoint_surface);
+                    println!("loaded checkpoint");
+                },
+                Err(err) => {
+                    println!("error loading checkpoint: {}", err);
+                },
+            }
         }
 
         let pool = ThreadPool::new(self.tasks);
@@ -71,9 +74,12 @@ impl Renderer {
         for (i, subsurface) in rx.iter().enumerate() {
             surface.merge(&subsurface);
             ::util::print_progress("Tile", start_time.clone(), (i + 1) as usize, jobs);
-            if Instant::now().duration_since(last_checkpoint.clone()) > Duration::from_secs(10) {
+            if self.options.write_checkpoints &&
+                Instant::now().duration_since(last_checkpoint.clone()) > Duration::from_secs(10) {
                 println!("writing checkpoint");
-                ::util::export::to_ppm(&surface, "checkpoint.ppm").expect("ppm write failure");
+                ::util::export::to_image(&surface, "checkpoint_new.png")
+                    .and_then(|_| ::std::fs::rename("checkpoint_new.png", "checkpoint.png"))
+                    .unwrap_or_else(|err| println!("failed to write checkpoint: {}", err));
                 last_checkpoint = Instant::now();
             }
         }
@@ -289,6 +295,7 @@ fn it_renders_the_background_of_an_empty_scene() {
         shadow_samples: 1,
         gloss_samples: 1,
         pixel_samples: 1,
+        write_checkpoints: false,
     };
 
 
