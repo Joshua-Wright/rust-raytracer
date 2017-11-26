@@ -165,8 +165,8 @@ fn main() {
         println!("Render done at {} ({}s)...\nWriting file...",
                  render_time, render_time - scene_time);
 
-        let out_file = format!("{}{}", config.output_file, ".ppm");
-        util::export::to_ppm(&image_data, &out_file).expect("ppm write failure");
+        let out_file = format!("{}{}", config.output_file, ".png");
+        util::export::to_image(&image_data, &out_file).expect("png write failure");
         let export_time = ::time::get_time().sec;
 
         println!("Write done: {} ({}s). Written to {}\nTotal: {}s",
