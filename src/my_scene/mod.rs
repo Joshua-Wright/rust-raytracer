@@ -9,6 +9,7 @@ pub mod fresnel;
 pub mod heptoroid;
 pub mod lucy;
 pub mod sibenik;
+pub mod sierpinski;
 pub mod sphere;
 pub mod sponza;
 pub mod tachikoma;
@@ -36,6 +37,7 @@ pub fn scene_by_name(name: &str) -> Option<Box<SceneConfig>> {
         "heptoroid-refractive" => Box::new(heptoroid::HeptoroidConfig::refractive()),
         "lucy" => Box::new(lucy::LucyConfig),
         "sibenik" => Box::new(sibenik::SibenikConfig),
+        "sierpinski" => Box::new(sierpinski::SierpinskiConfig),
         "sphere" => Box::new(sphere::SphereConfig),
         "sponza" => Box::new(sponza::SponzaConfig),
         "tachikoma" => Box::new(tachikoma::TachikomaConfig),

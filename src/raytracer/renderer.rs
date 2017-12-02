@@ -75,7 +75,7 @@ impl Renderer {
             surface.merge(&subsurface);
             ::util::print_progress("Tile", start_time.clone(), (i + 1) as usize, jobs);
             if self.options.write_checkpoints &&
-                Instant::now().duration_since(last_checkpoint.clone()) > Duration::from_secs(10) {
+                Instant::now().duration_since(last_checkpoint.clone()) > Duration::from_secs(60) {
                 println!("writing checkpoint");
                 ::util::export::to_image(&surface, "checkpoint_new.png")
                     .and_then(|_| ::std::fs::rename("checkpoint_new.png", "checkpoint.png"))

@@ -115,6 +115,15 @@ impl Mat4 {
         )
     }
 
+    pub fn scale_about_point(v: &Vec3, a: f64) -> Mat4 {
+        Mat4::new(
+            a, 0.0, 0.0, (1.0 - a) * v.x,
+            0.0, a, 0.0, (1.0 - a) * v.y,
+            0.0, 0.0, a, (1.0 - a) * v.z,
+            0.0, 0.0, 0.0, 1.0
+        )
+    }
+
     pub fn has_scale(&self) -> bool {
         Mat4::approx_eq(self.get(0, 0), self.get(1, 1)) &&
         Mat4::approx_eq(self.get(0, 0), self.get(2, 2))
