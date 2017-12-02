@@ -83,6 +83,8 @@ impl Renderer {
                 last_checkpoint = Instant::now();
             }
         }
+        ::std::fs::remove_file("checkpoint.png")
+            .unwrap_or_else(|err| println!("fialed to remove checpoint: {}", err));
         surface
     }
 
