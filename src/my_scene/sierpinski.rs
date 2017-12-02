@@ -28,7 +28,7 @@ pub fn get_camera(image_width: u32, image_height: u32, fov: f64) -> Camera {
 pub fn get_scene() -> Scene {
     let shiny = CookTorranceMaterial { k_a: 0.0, k_d: 0.2, k_s: 1.0, k_sg: 0.8, k_tg: 0.0, gauss_constant: 5.0, roughness: 0.01, glossiness: 0.0, ior: 0.25, ambient: Vec3::one(), diffuse: Vec3 { x: 1.0, y: 1.0, z: 1.0 }, specular: Vec3 { x: 0.9, y: 0.9, z: 0.9 }, transmission: Vec3::zero(), diffuse_texture: None };
 
-    let max = 12;
+    let max = 5;
     let mut pts = vec![Vec3 { x: 0.5, y: 0.28867513, z: 0.20412415 }];
     let r = 1.0 / 2.0;
     let t1 = Mat4::scale_about_point(&Vec3 { x: 0.0, y: 0.0, z: 0.0 }, r);
